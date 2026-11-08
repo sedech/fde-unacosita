@@ -1,0 +1,18 @@
+[project]
+name = "fde-unacosita"
+version = "0.2.0"
+description = "Motor LLM base — Curso Forward Deployed Engineer"
+requires-python = ">=3.11"
+dependencies = [
+    "groq>=0.11.0",
+    "pydantic>=2.0.0",
+    "python-dotenv>=1.0.0",
+    "sqlalchemy>=2.0.0",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
