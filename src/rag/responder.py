@@ -9,8 +9,10 @@ from pathlib import Path
 from dotenv import load_dotenv
 from groq import APIConnectionError, RateLimitError, APIStatusError
 
+import time
+from groq import Groq
 from modelos import Entrada, ErrorValidacion
-from motor import _llamar_groq, _parsear_y_validar
+from motor import _parsear_y_validar, _calcular_costo
 from rag.buscar import buscar
 
 load_dotenv()
@@ -19,7 +21,7 @@ PROJECT_ROOT   = Path(__file__).resolve().parent.parent.parent
 PROMPTS_DIR    = PROJECT_ROOT / "src" / "prompts"
 NEGOCIO_NOMBRE = os.getenv("NEGOCIO_NOMBRE", "Ferretería UnaCosita")
 
-UMBRAL_CONFIANZA_RAG = 0.3
+UMBRAL_CONFIANZA_RAG = 0.0  # filtro real de relevancia está en buscar.py (similitud coseno ≥ 0.70)
 
 
 def _cargar_prompt(nombre: str) -> str:
@@ -69,10 +71,27 @@ def responder(entrada_raw: dict) -> dict:
         consulta       = entrada.consulta,
     )
 
-    # 5. Llamar al LLM (motor PE2) — hasta 2 intentos
+    # 5. Llamar al LLM con prompt RAG — hasta 2 intentos
+    groq_key = os.getenv("GROQ_API_KEY")
+    modelo   = os.getenv("GROQ_MODEL", "qwen/qwen3.8-27b")
     for intento in range(1, 3):
         try:
-            texto, tok_in, tok_out, lat_ms = _llamar_groq(prompt_sistema, entrada.consulta)
+            cliente = Groq(api_key=groq_key)
+            t0 = time.monotonic()
+            resp = cliente.chat.completions.create(
+                model=modelo,
+                messages=[
+                    {"role": "system", "content": prompt_sistema},
+                    {"role": "user",   "content": entrada.consulta},
+                ],
+                temperature=0.1,
+                max_tokens=256,
+                response_format={"type": "json_object"},
+            )
+            lat_ms  = int((time.monotonic() - t0) * 1000)
+            texto   = resp.choices[0].message.content
+            tok_in  = resp.usage.prompt_tokens
+            tok_out = resp.usage.completion_tokens
         except APIConnectionError as e:
             return ErrorValidacion(
                 campo_fallido="conexion",

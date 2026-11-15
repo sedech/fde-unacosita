@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Optional
 
 import chromadb
-import google.generativeai as genai
+from google import genai as google_genai
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -17,17 +17,26 @@ load_dotenv()
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 CHROMA_BASE  = PROJECT_ROOT / "data" / "chroma"
 
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-EMBEDDING_MODEL = "models/text-embedding-004"
+GEMINI_API_KEY  = os.getenv("GEMINI_API_KEY")
+EMBEDDING_MODEL = "gemini-embedding-001"
 
 CHUNK_CONFIGS = {
     "small": {"tam": 200, "overlap": 50},
     "large": {"tam": 500, "overlap": 100},
 }
 
+_genai_client: Optional[google_genai.Client] = None
+
+
+def _get_client() -> google_genai.Client:
+    global _genai_client
+    if _genai_client is None:
+        _genai_client = google_genai.Client(api_key=GEMINI_API_KEY)
+    return _genai_client
+
 
 def _configurar_gemini():
-    genai.configure(api_key=GEMINI_API_KEY)
+    _get_client()
 
 
 def _chunkar(texto: str, tam: int, overlap: int) -> list[str]:
@@ -42,14 +51,15 @@ def _chunkar(texto: str, tam: int, overlap: int) -> list[str]:
 
 
 def _embed_batch(textos: list[str]) -> list[list[float]]:
+    client = _get_client()
     embeddings = []
     for texto in textos:
-        result = genai.embed_content(
+        result = client.models.embed_content(
             model=EMBEDDING_MODEL,
-            content=texto,
-            task_type="retrieval_document",
+            contents=texto,
+            config={"task_type": "RETRIEVAL_DOCUMENT"},
         )
-        embeddings.append(result["embedding"])
+        embeddings.append(list(result.embeddings[0].values))
     return embeddings
 
 

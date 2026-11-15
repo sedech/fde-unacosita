@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Optional
 
 import chromadb
-import google.generativeai as genai
+from google import genai as google_genai
 from dotenv import load_dotenv
 from rank_bm25 import BM25Okapi
 
@@ -15,22 +15,28 @@ load_dotenv()
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 CHROMA_BASE  = PROJECT_ROOT / "data" / "chroma"
-GEMINI_API_KEY   = os.getenv("GEMINI_API_KEY")
-EMBEDDING_MODEL  = "models/text-embedding-004"
-ROLES_VALIDOS    = {"cliente", "vendedor", "admin"}
+GEMINI_API_KEY  = os.getenv("GEMINI_API_KEY")
+EMBEDDING_MODEL = "gemini-embedding-001"
+ROLES_VALIDOS   = {"cliente", "vendedor", "admin"}
+
+_genai_client: Optional[google_genai.Client] = None
 
 
-def _configurar_gemini():
-    genai.configure(api_key=GEMINI_API_KEY)
+def _get_genai_client() -> google_genai.Client:
+    global _genai_client
+    if _genai_client is None:
+        _genai_client = google_genai.Client(api_key=GEMINI_API_KEY)
+    return _genai_client
 
 
 def _embed_query(consulta: str) -> list[float]:
-    result = genai.embed_content(
+    client = _get_genai_client()
+    result = client.models.embed_content(
         model=EMBEDDING_MODEL,
-        content=consulta,
-        task_type="retrieval_query",
+        contents=consulta,
+        config={"task_type": "RETRIEVAL_QUERY"},
     )
-    return result["embedding"]
+    return list(result.embeddings[0].values)
 
 
 def _get_collection(config: str) -> Optional[chromadb.Collection]:
@@ -48,14 +54,19 @@ def _rrf_score(rank: int, k: int = 60) -> float:
     return 1.0 / (k + rank)
 
 
+MIN_SIMILITUD_COSENO = 0.70  # por debajo → sin evidencia relevante
+
+
 def buscar(
     consulta: str,
     rol: str,
     k: int = 4,
     config: str = "small",
+    min_similitud: float = MIN_SIMILITUD_COSENO,
 ) -> list[dict]:
     """
     Búsqueda híbrida: vectorial (Gemini) + BM25, fusión RRF, filtro de permisos.
+    Retorna [] si la mejor similitud coseno es menor a min_similitud.
 
     Retorna lista de dicts:
     {fragmento_id, documento, seccion, texto, puntaje, rol}
@@ -67,7 +78,7 @@ def buscar(
     if coleccion is None:
         return []
 
-    _configurar_gemini()
+    _get_genai_client()  # inicializa cliente
 
     filtro = {f"rol_{rol}": True}
 
@@ -89,6 +100,12 @@ def buscar(
         where=filtro,
         include=["documents", "metadatas", "distances"],
     )
+    # Filtro de relevancia: si el mejor resultado no supera el umbral, sin evidencia
+    if vec_res["distances"][0]:
+        mejor_similitud = 1.0 - vec_res["distances"][0][0]
+        if mejor_similitud < min_similitud:
+            return []
+
     vec_ids    = vec_res["ids"][0]          # top k*2 ids en orden de similitud
     vec_rank   = {id_: rank for rank, id_ in enumerate(vec_ids)}
 
