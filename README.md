@@ -52,15 +52,44 @@ cd src
 python ../scripts/ejecutar_5_consultas.py
 ```
 
+## Módulo RAG — PE3
+
+Búsqueda híbrida sobre catálogo y documentos internos con control de acceso por rol.
+
+| Rol | Catálogo público | Lista proveedores | Condiciones comerciales |
+|-----------|:---:|:---:|:---:|
+| cliente | ✅ | ❌ | ❌ |
+| vendedor | ✅ | ✅ | ❌ |
+| admin | ✅ | ✅ | ✅ |
+
+```bash
+# Correr demostración PE3
+python scripts/ejecutar_pe3.py
+
+# Solo tests de permisos
+pytest tests/
+```
+
 ## Estructura
 
 ```
 src/
   modelos.py          # Pydantic: Entrada, Salida, ErrorValidacion
   motor.py            # Motor LLM (Groq)
-  db.py               # Conexión SQLAlchemy (se expande en PE3)
+  db.py               # Conexión SQLAlchemy
   prompts/
     consulta_precio.txt
+    rag_respuesta.txt  # Prompt con contexto RAG
+  rag/
+    ingestar.py        # ChromaDB + embeddings Gemini
+    buscar.py          # Vectorial + BM25 + RRF + permisos
+    responder.py       # Integración motor PE2 + RAG
+data/
+  docs/               # Documentos de conocimiento (.txt)
+  preguntas_prueba.json
 scripts/
   ejecutar_5_consultas.py
+  ejecutar_pe3.py
+tests/
+  test_permisos.py
 ```
