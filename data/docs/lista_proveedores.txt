@@ -1,0 +1,14 @@
+— Sección: Costos Ferretodo (proveedor principal)
+Tornillo cabeza hexagonal 1/4 x 1" caja x50: costo $1.680 (margen 40%)
+Llave inglesa 10" Stanley: costo $5.040 (margen 40%)
+Pintura látex blanco 4L Sherwin-Williams: costo $7.680 (margen 40%)
+
+— Sección: Costos Distribuidora Norte
+Taco Fischer 6mm bolsa x50: costo $720 (margen 40%)
+Rodillo antialpiste 23cm: costo $1.170 (margen 40%)
+
+— Sección: Condiciones de pago a proveedores
+Ferretodo: 30 días netos.
+Distribuidora Norte: contado con 5% descuento.
+
+— Metadatos: roles = ["vendedor", "admin"]

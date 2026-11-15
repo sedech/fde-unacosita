@@ -1,0 +1,13 @@
+— Sección: Descuentos por volumen
+Compras mayores a $50.000: 8% descuento.
+Compras mayores a $100.000: 12% descuento.
+Clientes con cuenta corriente: plazo 15 días.
+
+— Sección: Política de devoluciones
+Productos sin uso: 7 días con ticket.
+Herramientas eléctricas: sin devolución salvo defecto de fábrica.
+
+— Sección: Clientes con cuenta corriente
+Lista habilitada: Constructora Pérez, Taller Hermanos Gómez, Municipalidad de Rosario zona norte.
+
+— Metadatos: roles = ["admin"]

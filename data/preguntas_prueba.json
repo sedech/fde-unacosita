@@ -1,0 +1,12 @@
+[
+  {"id": 1, "pregunta": "¿Cuánto sale la caja de tornillos 1/4?", "documento_esperado": "catalogo_publico", "tipo": "normal", "rol": "cliente"},
+  {"id": 2, "pregunta": "¿Tienen llave inglesa Stanley 10 pulgadas?", "documento_esperado": "catalogo_publico", "tipo": "normal", "rol": "cliente"},
+  {"id": 3, "pregunta": "¿Cuál es el precio de la pintura látex blanco 4 litros?", "documento_esperado": "catalogo_publico", "tipo": "normal", "rol": "cliente"},
+  {"id": 4, "pregunta": "¿Qué descuento me dan si compro más de 50 mil pesos?", "documento_esperado": "condiciones_comerciales", "tipo": "normal", "rol": "admin"},
+  {"id": 5, "pregunta": "¿Cuál es el costo del proveedor para los tornillos?", "documento_esperado": "lista_proveedores", "tipo": "normal", "rol": "vendedor"},
+  {"id": 6, "pregunta": "¿Cuáles son las condiciones de pago a Ferretodo?", "documento_esperado": "lista_proveedores", "tipo": "normal", "rol": "vendedor"},
+  {"id": 7, "pregunta": "¿Tienen cemento Portland?", "documento_esperado": null, "tipo": "sin_respuesta", "rol": "cliente"},
+  {"id": 8, "pregunta": "¿Cuánto cuesta instalar el techo?", "documento_esperado": null, "tipo": "sin_respuesta", "rol": "cliente"},
+  {"id": 9, "pregunta": "¿Cuál es el margen de ganancia de la llave inglesa?", "documento_esperado": "lista_proveedores", "tipo": "restringido", "rol": "cliente"},
+  {"id": 10, "pregunta": "¿Qué empresas tienen cuenta corriente habilitada?", "documento_esperado": "condiciones_comerciales", "tipo": "restringido", "rol": "vendedor"}
+]

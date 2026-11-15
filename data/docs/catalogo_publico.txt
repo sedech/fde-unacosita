@@ -1,0 +1,16 @@
+— Sección: Fijaciones
+Tornillo cabeza hexagonal 1/4 x 1" (caja x50): $2.800
+Tornillo autoperforante 8x1" (caja x100): $1.950
+Taco Fischer 6mm (bolsa x50): $1.200
+
+— Sección: Herramientas manuales
+Llave inglesa 10" Stanley: $8.400
+Destornillador Phillips #2 Black+Decker: $2.100
+Pinza de punta fina 6" Bahco: $3.600
+
+— Sección: Pintura y acabados
+Pintura látex blanco 4L Sherwin-Williams: $12.800
+Lija al agua grano 220 (pliego): $380
+Rodillo antialpiste 23cm con mango: $1.950
+
+— Metadatos: roles = ["cliente", "vendedor", "admin"]
